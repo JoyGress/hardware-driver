@@ -1,5 +1,13 @@
 from random import randint
 from time import sleep
+from practicum import findDevices
+from peri import PeriBoard
+
+#setup Board
+
+devices = findDevices()
+b = PeriBoard(devices[0])
+
 board = [[0,0,0],[0,0,0],[0,0,0]]
 state = False # game state
 pos = 1 # position
@@ -12,8 +20,8 @@ def set_board(): # set led on PCB board
     for i in range(9):
         row = i // 3
         column = i % 3
-        set_led(i,board[row][column])
-        sleep(0.01) # delay between show led
+        b.set_led(i,board[row][column])
+        sleep(0.05) # delay between show led
 
 def beginBoard(): # Randomize Board
     for i in range(9):
@@ -66,21 +74,21 @@ def push(a): # for pushing the buttom (switch the light at position a)
     check_solve()
     global pos
     pos = 1
-    set_position_index(pos)
+    b.set_position_index(pos)
 
 def moveleft(): # Move left
     global pos
     pos -= 1
     if(pos < 1):
         pos += 9
-    set_position_index(pos)
+    b.set_position_index(pos)
 
 def moveright(): # Move left
     global pos
     pos += 1
     if(pos > 9):
         pos -= 9
-    set_position_index(pos)
+    b.set_position_index(pos)
 
 def action(data): # Getting input for button from PCB then do action according to the input
     global last
@@ -105,18 +113,24 @@ def action(data): # Getting input for button from PCB then do action according t
 
 # main stats here
 
-set_alarm(1)
-set_position_index(1)
+b.set_alarm(1)
+b.set_position_index(1)
 beginBoard()
+set_board()
 print("Current position : 1")
 while(state): # While game haven't ended, get input
     forceEndTime +=1 # increment time by 0.1 second (forceEndtime = 1800 is equal to 3 minute)
     if(forceEndTime == 1800): # if timer exceed 3 minute, ends game
         state = False
-    outBoard()
-    data = get_switch()
+   # outBoard()
+    data = b.get_switch()
     action(data)
     sleep(0.1)
-set_alarm(0)
+b.set_alarm(0)
+for i in range(9):
+    b.set_led(i,0)
+    sleep(0.05)
+
+
 
 # เนื่องจากมี delay ตอนปรับ LED ทำให้เวลาจริงอาจเกิน 3 นาที แต่นิดหน่อยช่างมัน

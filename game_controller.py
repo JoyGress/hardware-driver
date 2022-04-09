@@ -1,13 +1,13 @@
 import requests
 from math import floor
-from time import time
+from time import time, sleep
 import json
-from practicum import findDevcies()
+from practicum import findDevices
 from peri import PeriBoard
 
 
 devices = findDevices()
-
+b = PeriBoard(devices[0])
 
 def get_request(): # use to check if it's alarm time or not
     r = requests.get("http://127.0.0.1:8000/isalarm/")
@@ -22,10 +22,10 @@ def get_request(): # use to check if it's alarm time or not
 
 while(1):
     if(get_request()): # if it's alarm time , starts game
-        exec(open('togglehard.py').read())
-    else: # else show time
-        curtime = (time() + 7 * 3600) % 86400
-        hour = floor(curtime / 3600)
-        minute = floor(curtime % 3600 / 60)
-        b.set_time(hour,minute)
-    time.sleep(60)
+        exec(open('ingame.py').read())
+     # else show time
+    curtime = (time() + 7 * 3600) % 86400
+    hour = floor(curtime / 3600)
+    minute = floor(curtime % 3600 / 60)
+    b.set_time(hour,minute)
+    sleep(60)

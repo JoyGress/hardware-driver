@@ -15,7 +15,7 @@ class PeriBoard(McuBoard):
         #switch_state = [0,0,0]
         getSwitch2 = self.usbRead(RQ_GET_SWITCH,length=1)
         getSwitch = bin(getSwitch2[0])
-        print(f'getSwitch = {getSwitch}  len = {len(getSwitch)} last_index = {getSwitch[-1]} {(len(getSwitch) == 3 and getSwitch[-1] == 0)}')
+        #print(f'getSwitch = {getSwitch}  len = {len(getSwitch)} last_index = {getSwitch[-1]} {(len(getSwitch) == 3 and getSwitch[-1] == 0)}')
         if(len(getSwitch) == 3 and int(getSwitch[-1]) == 0):
             return [0,0,0]
         elif(len(getSwitch) == 3 and int(getSwitch[-1]) == 1):
