@@ -9,6 +9,11 @@
 #define RQ_SET_GAME_POSTION 4
 #define RQ_SET_TIME 5
 
+////////////////////////Function Declare
+
+void set_lcd();
+void set_buzzer();
+
 ///////////////////////Global Variable
 
 LiquidCrystal_I2C lcd(0x27,16,2);
@@ -17,7 +22,7 @@ static uint8_t current_position = 9;
 static uint8_t new_position = 0;
 static uint8_t current_time_hour = 0;
 static uint8_t current_time_minute = 0;
-static uint8_t new_time_hour = 2;
+static uint8_t new_time_hour = 12;
 static uint8_t new_time_minute = 0;
 
 ////////////////////////////
@@ -76,14 +81,16 @@ usbMsgLen_t usbFunctionSetup(uint8_t data[8]){
 	}else if(rq->bRequest == RQ_SET_GAME_POSTION){
     new_position = rq->wValue.bytes[0];
 	}else if(rq->bRequest == RQ_SET_TIME){
-	  new_time_hour = rq->wIndex.bytes[0];
+    new_time_hour = rq->wIndex.bytes[0];
     new_time_minute = rq->wValue.bytes[0];
+    
 	}
 	return 0;
 }
 
 
 void setup(){
+  /////////////////////////PIN Setup
 	pinMode(PIN_PB0,OUTPUT); //led1
 	pinMode(PIN_PB1,OUTPUT); //led2
 	pinMode(PIN_PB2,OUTPUT); //led3
@@ -91,32 +98,28 @@ void setup(){
 	pinMode(PIN_PB4,OUTPUT); //led5
 	pinMode(PIN_PB5,OUTPUT); //led6
 	pinMode(PIN_PD0,OUTPUT); //led7
-	pinMode(PIN_PD1,OUTPUT); //
+	//pinMode(PIN_PD1,OUTPUT); //broken
 	pinMode(PIN_PD5,OUTPUT); //led8
-  //digitalWrite(PIN_PD1,LOW);
 	pinMode(PIN_PD6,OUTPUT); //led9 
 	pinMode(PIN_PC0,INPUT); //switch left
 	pinMode(PIN_PC1,INPUT); //switch right
 	pinMode(PIN_PC2,INPUT); //switch confirm
-
 	pinMode(PIN_PC3,OUTPUT); //buzzer active
-//	digitalWrite(PIN_PC3,LOW);
-//	buzz_status = 1;
-  //digitalWrite(PIN_PB0,HIGH);
-  //digitalWrite(PIN_PB2,HIGH);
-  //digitalWrite(PIN_PB4,HIGH);
+
 	//LCD setup
 	lcd.init();
-//  lcd.begin();
   lcd.backlight();
   lcd.setCursor(4,0);
   lcd.print("Practicum");
+  delay(2000);
   lcd.setCursor(0,1);
   lcd.print("Hello World");
+  delay(5000);
 
+
+  //Usb Setup
 	usbInit();
   
-
 	usbDeviceDisconnect();
 	delay(300);
 	usbDeviceConnect();
@@ -124,19 +127,12 @@ void setup(){
 }
 
 void loop(){
-  
 	usbPoll();
-	//digitalWrite(PIN_PD3,HIGH);
-	//delay(500);
-	//digitalWrite(PIN_PD3,LOW);
-	//delay(500);
-	if(buzz_status == 0){
-		digitalWrite(PIN_PC3,LOW);
-    current_position = 9;
-	}else{
-		digitalWrite(PIN_PC3,HIGH);
-	}
+	set_buzzer();
+  set_lcd();
+}
 
+void set_lcd(){
   if(buzz_status == 1){ /// Playing Game
     if(new_position != current_position){
       lcd.clear();
@@ -170,8 +166,14 @@ void loop(){
       current_time_hour = new_time_hour;
       current_time_minute = new_time_minute;
     }
-    //Show Time
   
   }
+}
 
+void set_buzzer(){
+  if(buzz_status == 0){
+    digitalWrite(PIN_PC3,LOW);
+  }else{
+    digitalWrite(PIN_PC3,HIGH);
+  }
 }
